@@ -101,6 +101,12 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
    - Advance Java
        - Day 24 (Java 8 Stream API )Lambda Expression , Use Functional Programing 
        - Day 24 Practice Problem
+    
+# May 23
+
+   - Advance Java
+        - Day 26 Java Programming Workshop
+        - Hotel Reservation Problem
 
    
      
