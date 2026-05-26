@@ -108,7 +108,18 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
         - Day 26 Java Programming Workshop
         - Hotel Reservation Problem
 
-   
+# May 25
+
+   - IO Stream
+       - Day 27 – Java File I/O: Practice Problems
+       - Day 28 – Annotations & Third-Party Libraries
+       - Day 28 – Practice Problems
+
+# May 26
+
+   - IO Stream
+       - Day 28 – Practice Problems
+       - Day 29 – Applying Design Principles
      
 
 
