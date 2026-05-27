@@ -120,6 +120,12 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
    - IO Stream
        - Day 28 – Practice Problems
        - Day 29 – Applying Design Principles
+
+# May 27
+
+   - IO Stream
+        - Learn about SOLID Principle and Problems
+        - Day 28 Practice Problem
      
 
 
