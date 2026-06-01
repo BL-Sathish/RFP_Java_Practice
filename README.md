@@ -139,6 +139,13 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
       - Day 30 – Test-Driven Development (TDD)
       - Day 30 – Practice Problems
       - MySQL – Downloaded and Installed
+
+# June 1
+
+   - IO Stream
+      - Day 31 – MySQL Database Introduction
+      - Day 31 – Practice Problems
+      - Day 32 – ER Diagram Introduction
      
 
 
