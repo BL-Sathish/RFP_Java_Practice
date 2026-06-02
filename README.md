@@ -146,6 +146,13 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
       - Day 31 – MySQL Database Introduction
       - Day 31 – Practice Problems
       - Day 32 – ER Diagram Introduction
+
+# June 2
+
+   - IO Stream
+      - Day 32 – Practice Problems
+      - Day 33 – JDBC Introduction
+      - Day 34 – JDBC Prepared Statement
      
 
 
