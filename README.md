@@ -153,6 +153,11 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
       - Day 32 – Practice Problems
       - Day 33 – JDBC Introduction
       - Day 34 – JDBC Prepared Statement
-     
+
+# June 3
+
+   - IO Stream
+       - Day 34 – JDBC Prepared Statement
+       - Day 34 – Practice Problems
 
 
