@@ -138,7 +138,7 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
    - IO Stream
       - Day 30 – Test-Driven Development (TDD)
       - Day 30 – Practice Problems
-      - MySQL – Downloaded and Installed
+      - MySQL Downloaded and Installed
 
 # June 1
 
@@ -160,4 +160,14 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
        - Day 34 – JDBC Prepared Statement
        - Day 34 – Practice Problems
 
+# June 4
+
+   - IO Stream
+      - Day 35 – JDBC Transactions
+      - Day 35 – Practice Problems
+    
+# June 5
+
+   - IO Stream
+      - Day 37 – I/O Streams Workshop
 
