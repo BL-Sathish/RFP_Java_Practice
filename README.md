@@ -170,4 +170,10 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
 
    - IO Stream
       - Day 37 – I/O Streams Workshop
+    
+# June 9
+
+  - Web Intro
+      - Day 38 – JavaScript Programming Constructs
+      - Day 38 – Practice Problems
 
