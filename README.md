@@ -180,5 +180,11 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
 # June 12
 
    - Web Intro
-       - Day 38  Data Structure Practice Problem for Java Script Coding problems basic loops,conditions
+       - Day 38  Programming Construct Practice Problem for Java Script Coding problems basic loops,conditions
+    
+# June 15
+
+   - Web Intro
+       - Day 39 Java Script Data Structure
+       - Day 29 Practice Problem and Examples
 
