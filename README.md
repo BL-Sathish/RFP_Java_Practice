@@ -186,5 +186,5 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
 
    - Web Intro
        - Day 39 Java Script Data Structure
-       - Day 29 Practice Problem and Examples
+       - Day 39 Practice Problem and Examples
 
