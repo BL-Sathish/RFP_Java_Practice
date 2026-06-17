@@ -187,4 +187,10 @@ The SRM Mentors – Java Fellowship is an intensive, hands-on training program d
    - Web Intro
        - Day 39 Java Script Data Structure
        - Day 39 Practice Problem and Examples
+    
+# June 16
+
+   - Web Intro
+        - Learn about Arrow Functions ,types and both inline as function variable
+        - JS Objects create a real time many fields,variables
 
