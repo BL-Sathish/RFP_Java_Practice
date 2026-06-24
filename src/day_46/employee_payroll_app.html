@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Payroll App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --bg2: #161b27;
+      --bg3: #1e253a;
+      --surface: #222b40;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
+      --text: #e8eaf0;
+      --text2: #8b93a8;
+      --text3: #545e75;
+      --accent: #4f8ef7;
+      --accent2: #3a7de8;
+      --success: #34d399;
+      --success-bg: rgba(52,211,153,0.1);
+      --danger: #f87171;
+      --danger-bg: rgba(248,113,113,0.1);
+      --warning: #fbbf24;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface); border-radius: 3px; }
+
+    /* ── Layout ── */
+    .app-shell { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 0;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+    }
+
+    .logo {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .logo-text { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+    .logo-sub { font-size: 11px; color: var(--text3); margin-top: 1px; font-family: 'DM Mono', monospace; }
+
+    .nav-section { padding: 0 12px; margin-bottom: 8px; }
+    .nav-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px;
+      border-radius: var(--radius);
+      color: var(--text2);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.7; }
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active { background: rgba(79,142,247,0.15); color: var(--accent); }
+    .nav-item.active svg { opacity: 1; }
+
+    .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
+
+    .topbar {
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .page-title { font-size: 18px; font-weight: 600; letter-spacing: -0.4px; }
+    .page-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    /* ── Content ── */
+    .content { padding: 24px 28px; flex: 1; }
+
+    /* ── Stats ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: var(--border2); }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .stat-card:hover::before { opacity: 1; }
+    .stat-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: rgba(79,142,247,0.12);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .stat-icon svg { width: 16px; height: 16px; color: var(--accent); }
+    .stat-label { font-size: 12px; color: var(--text3); margin-bottom: 4px; }
+    .stat-value { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+    .stat-value.mono { font-family: 'DM Mono', monospace; font-size: 16px; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .search-wrap {
+      position: relative; flex: 1;
+    }
+    .search-wrap svg {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      width: 15px; height: 15px; color: var(--text3); pointer-events: none;
+    }
+    .search-wrap input {
+      width: 100%; padding: 0 12px 0 36px;
+      height: 38px; border-radius: var(--radius);
+      background: var(--bg2); border: 1px solid var(--border);
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px;
+      outline: none; transition: border-color 0.15s;
+    }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-wrap input::placeholder { color: var(--text3); }
+
+    select.filter {
+      height: 38px; padding: 0 12px;
+      border-radius: var(--radius); border: 1px solid var(--border);
+      background: var(--bg2); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 13px;
+      outline: none; cursor: pointer; min-width: 150px;
+    }
+    select.filter:focus { border-color: var(--accent); }
+
+    /* ── Buttons ── */
+    .btn {
+      height: 38px; padding: 0 16px;
+      border-radius: var(--radius); border: 1px solid var(--border2);
+      background: var(--bg2); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .btn:hover { background: var(--bg3); border-color: var(--border2); }
+    .btn svg { width: 15px; height: 15px; }
+
+    .btn-primary {
+      background: var(--accent); border-color: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
+
+    .btn-danger {
+      background: var(--danger-bg); border-color: rgba(248,113,113,0.3);
+      color: var(--danger);
+    }
+    .btn-danger:hover { background: rgba(248,113,113,0.2); }
+
+    .btn-sm { height: 30px; padding: 0 10px; font-size: 12px; border-radius: 7px; }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11px; font-weight: 600;
+      color: var(--text3); letter-spacing: 0.6px; text-transform: uppercase;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.12s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.025); }
+    tbody td { padding: 13px 16px; vertical-align: middle; }
+
+    .emp-cell { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; flex-shrink: 0;
+    }
+    .emp-name { font-weight: 500; font-size: 13px; }
+    .emp-id { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+    .badge-active { background: var(--success-bg); color: var(--success); }
+    .badge-inactive { background: rgba(139,147,168,0.12); color: var(--text2); }
+    .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+    .dept-pill {
+      padding: 3px 9px; border-radius: 6px;
+      font-size: 11px; font-weight: 500;
+      background: var(--bg3); color: var(--text2);
+    }
+
+    .salary-cell { font-family: 'DM Mono', monospace; font-size: 13px; }
+    .salary-gross { font-size: 11px; color: var(--text3); }
+
+    .action-btns { display: flex; gap: 6px; }
+    .icon-btn {
+      width: 30px; height: 30px; border-radius: 7px;
+      border: 1px solid var(--border); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text3);
+      transition: all 0.15s;
+    }
+    .icon-btn svg { width: 14px; height: 14px; }
+    .icon-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+    .icon-btn.del:hover { background: var(--danger-bg); color: var(--danger); border-color: rgba(248,113,113,0.3); }
+    .icon-btn.view:hover { background: rgba(79,142,247,0.12); color: var(--accent); border-color: rgba(79,142,247,0.3); }
+
+    .empty-state {
+      text-align: center; padding: 56px 20px; color: var(--text3);
+    }
+    .empty-state svg { width: 40px; height: 40px; margin-bottom: 12px; opacity: 0.4; }
+    .empty-state p { font-size: 13px; }
+
+    /* ── Modal ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.open { display: flex; }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      width: 520px; max-width: 96vw;
+      max-height: 90vh; overflow-y: auto;
+      animation: slideUp 0.2s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(16px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title { font-size: 15px; font-weight: 600; }
+    .modal-close {
+      width: 28px; height: 28px; border-radius: 7px;
+      border: 1px solid var(--border); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text3);
+    }
+    .modal-close:hover { background: var(--bg3); color: var(--text); }
+    .modal-close svg { width: 14px; height: 14px; }
+
+    .modal-body { padding: 20px 24px; }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex; gap: 8px; justify-content: flex-end;
+    }
+
+    .form-section { margin-bottom: 20px; }
+    .form-section-title {
+      font-size: 11px; font-weight: 600; color: var(--text3);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: span 2; }
+    .form-label { font-size: 12px; color: var(--text2); font-weight: 500; }
+    .form-input {
+      height: 36px; padding: 0 12px;
+      border-radius: var(--radius); border: 1px solid var(--border);
+      background: var(--bg3); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 13px;
+      outline: none; transition: border-color 0.15s;
+    }
+    .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,142,247,0.1); }
+    .form-input::placeholder { color: var(--text3); }
+    .form-input.mono { font-family: 'DM Mono', monospace; }
+
+    /* ── View Modal ── */
+    .payslip {
+      background: var(--bg3);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .payslip-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .payslip-row:last-child { border-bottom: none; }
+    .payslip-row.total {
+      background: var(--bg2);
+      font-weight: 600; font-size: 14px;
+    }
+    .payslip-row.deduction .value { color: var(--danger); }
+    .payslip-row.gross .value { color: var(--warning); }
+    .payslip-row.total .value { color: var(--success); }
+    .payslip-row .label { color: var(--text2); }
+    .payslip-row .value { font-family: 'DM Mono', monospace; }
+
+    .emp-info-card {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px;
+      background: var(--bg3); border-radius: var(--radius);
+      margin-bottom: 16px;
+    }
+    .emp-info-avatar { width: 48px; height: 48px; border-radius: 12px; font-size: 15px; }
+    .emp-info-name { font-size: 16px; font-weight: 600; }
+    .emp-info-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+    /* ── Toast ── */
+    .toast-wrap {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+      padding: 12px 16px; border-radius: var(--radius);
+      background: var(--bg2); border: 1px solid var(--border2);
+      font-size: 13px; display: flex; align-items: center; gap: 10px;
+      animation: fadeInUp 0.25s ease;
+      min-width: 240px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    @keyframes fadeInUp {
+      from { transform: translateY(10px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+    .toast.success .toast-dot { background: var(--success); }
+    .toast.danger  .toast-dot { background: var(--danger); }
+    .toast-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .content { padding: 16px; }
+      .topbar { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+        </div>
+        <div>
+          <div class="logo-text">PayRoll</div>
+          <div class="logo-sub">v1.0 · CRUD</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <button class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" onclick="showToast('Employees section — already here!','success')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Employees
+      </button>
+      <button class="nav-item" onclick="showToast('Payroll reports coming soon!','success')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Reports
+      </button>
+    </div>
+
+    <div class="nav-section" style="margin-top:auto">
+      <div class="nav-label">System</div>
+      <button class="nav-item" onclick="showToast('Settings coming soon!','success')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Employee Payroll</div>
+        <div class="page-sub">Manage employee records &amp; payroll data</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Employee
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Stats -->
+      <div class="stats-grid" id="stats-grid"></div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search" placeholder="Search name, ID, department…" oninput="renderTable()">
+        </div>
+        <select class="filter" id="dept-filter" onchange="renderTable()">
+          <option value="">All Departments</option>
+        </select>
+        <select class="filter" id="status-filter" onchange="renderTable()">
+          <option value="">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Department</th>
+              <th>Role</th>
+              <th>Gross / Year</th>
+              <th>Net / Year</th>
+              <th>Status</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Add Employee</div>
+      <button class="modal-close" onclick="closeModal()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+/* ─── Data ─── */
+const AVATAR_COLORS = [
+  ['#1e3a5f','#4f8ef7'], ['#1e3f2a','#34d399'], ['#3f1e2a','#f87171'],
+  ['#3f3a1e','#fbbf24'], ['#2a1e3f','#a78bfa'], ['#1e3a3a','#2dd4bf']
+];
+
+let employees = [
+  { id:'EMP001', fname:'Arun',   lname:'Kumar',   dept:'Engineering', role:'Sr. Developer',  salary:900000, hra:180000, da:90000,  pf:108000, tax:135000, status:'Active'   },
+  { id:'EMP002', fname:'Priya',  lname:'Sharma',  dept:'HR',          role:'HR Manager',     salary:700000, hra:140000, da:70000,  pf:84000,  tax:105000, status:'Active'   },
+  { id:'EMP003', fname:'Ravi',   lname:'Nair',    dept:'Finance',     role:'Accountant',     salary:600000, hra:120000, da:60000,  pf:72000,  tax:90000,  status:'Active'   },
+  { id:'EMP004', fname:'Meena',  lname:'Pillai',  dept:'Marketing',   role:'Brand Lead',     salary:750000, hra:150000, da:75000,  pf:90000,  tax:112500, status:'Active'   },
+  { id:'EMP005', fname:'Suresh', lname:'Babu',    dept:'Sales',       role:'Sales Executive',salary:550000, hra:110000, da:55000,  pf:66000,  tax:82500,  status:'Inactive' },
+  { id:'EMP006', fname:'Divya',  lname:'Menon',   dept:'Engineering', role:'QA Engineer',    salary:680000, hra:136000, da:68000,  pf:81600,  tax:102000, status:'Active'   },
+];
+let editId = null;
+let nextNum = 7;
+
+/* ─── Helpers ─── */
+const fmt   = n => '₹' + Math.round(n).toLocaleString('en-IN');
+const gross = e => e.salary + e.hra + e.da;
+const net   = e => gross(e) - e.pf - e.tax;
+const initials = e => (e.fname[0] + e.lname[0]).toUpperCase();
+const avatarColor = id => AVATAR_COLORS[parseInt(id.replace('EMP','')) % AVATAR_COLORS.length];
+const genId = () => { const n = nextNum++; return 'EMP' + (n<10?'00':n<100?'0':'') + n; };
+
+/* ─── Stats ─── */
+function renderStats() {
+  const active = employees.filter(e => e.status === 'Active');
+  const totalGross = employees.reduce((s,e) => s + gross(e), 0);
+  const totalNet   = employees.reduce((s,e) => s + net(e),   0);
+  const avg        = employees.length ? net(employees.reduce((a,b) => net(a)>net(b)?a:b)) : 0;
+
+  const stats = [
+    { label:'Total Employees', value: employees.length, icon: usersIcon(), color:'var(--accent)' },
+    { label:'Active Staff',    value: active.length,    icon: checkIcon(),  color:'var(--success)' },
+    { label:'Total Gross/yr',  value: fmt(totalGross),  icon: rupeeIcon(),  color:'var(--warning)', mono:true },
+    { label:'Total Net/yr',    value: fmt(totalNet),    icon: rupeeIcon(),  color:'var(--success)', mono:true },
+  ];
+
+  document.getElementById('stats-grid').innerHTML = stats.map(s => `
+    <div class="stat-card">
+      <div class="stat-icon" style="background:${s.color}18">${s.icon.replace('currentColor', s.color)}</div>
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value${s.mono?' mono':''}">${s.value}</div>
+    </div>
+  `).join('');
+}
+
+/* ─── Dept Filter ─── */
+function updateDeptFilter() {
+  const sel = document.getElementById('dept-filter');
+  const cur = sel.value;
+  const depts = [...new Set(employees.map(e => e.dept))].sort();
+  sel.innerHTML = '<option value="">All Departments</option>' +
+    depts.map(d => `<option value="${d}"${d===cur?' selected':''}>${d}</option>`).join('');
+}
+
+/* ─── Table ─── */
+function renderTable() {
+  renderStats();
+  updateDeptFilter();
+
+  const q   = document.getElementById('search').value.toLowerCase();
+  const df  = document.getElementById('dept-filter').value;
+  const sf  = document.getElementById('status-filter').value;
+
+  const list = employees.filter(e => {
+    const txt = `${e.fname} ${e.lname} ${e.id} ${e.dept} ${e.role}`.toLowerCase();
+    return txt.includes(q) && (!df || e.dept===df) && (!sf || e.status===sf);
+  });
+
+  const tbody = document.getElementById('tbody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
+      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <p>No employees found</p>
+    </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(e => {
+    const [bgC, fgC] = avatarColor(e.id);
+    const g = gross(e), n = net(e);
+    return `
+    <tr>
+      <td>
+        <div class="emp-cell">
+          <div class="avatar" style="background:${bgC};color:${fgC}">${initials(e)}</div>
+          <div>
+            <div class="emp-name">${e.fname} ${e.lname}</div>
+            <div class="emp-id">${e.id}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="dept-pill">${e.dept}</span></td>
+      <td style="color:var(--text2);font-size:13px">${e.role}</td>
+      <td class="salary-cell">${fmt(g)}</td>
+      <td class="salary-cell" style="color:var(--success)">${fmt(n)}</td>
+      <td><span class="badge badge-${e.status.toLowerCase()}">${e.status}</span></td>
+      <td>
+        <div class="action-btns" style="justify-content:flex-end">
+          <button class="icon-btn view" onclick="viewEmployee('${e.id}')" title="View payslip">
+            ${eyeIcon()}
+          </button>
+          <button class="icon-btn" onclick="editEmployee('${e.id}')" title="Edit">
+            ${editIcon()}
+          </button>
+          <button class="icon-btn del" onclick="deleteEmployee('${e.id}')" title="Delete">
+            ${trashIcon()}
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ─── Modal helpers ─── */
+function openModal() { document.getElementById('overlay').classList.add('open'); }
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  editId = null;
+}
+
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* ─── Form HTML ─── */
+function formHTML(e = {}) {
+  return `
+  <div class="form-section">
+    <div class="form-section-title">Personal Info</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">First Name *</label>
+        <input class="form-input" id="f-fname" placeholder="First name" value="${e.fname||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name *</label>
+        <input class="form-input" id="f-lname" placeholder="Last name" value="${e.lname||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Department</label>
+        <select class="form-input" id="f-dept">
+          ${['Engineering','HR','Finance','Marketing','Sales','Operations'].map(d =>
+            `<option${e.dept===d?' selected':''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role *</label>
+        <input class="form-input" id="f-role" placeholder="e.g. Developer" value="${e.role||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-input" id="f-status">
+          <option${!e.status||e.status==='Active'?' selected':''}>Active</option>
+          <option${e.status==='Inactive'?' selected':''}>Inactive</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="form-section-title">Earnings (₹ / year)</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Basic Salary</label>
+        <input class="form-input mono" id="f-salary" type="number" min="0" step="1000" placeholder="500000" value="${e.salary||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">HRA</label>
+        <input class="form-input mono" id="f-hra" type="number" min="0" step="500" placeholder="100000" value="${e.hra||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">DA</label>
+        <input class="form-input mono" id="f-da" type="number" min="0" step="500" placeholder="50000" value="${e.da||''}">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="form-section-title">Deductions (₹ / year)</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">PF</label>
+        <input class="form-input mono" id="f-pf" type="number" min="0" step="500" placeholder="60000" value="${e.pf||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Income Tax</label>
+        <input class="form-input mono" id="f-tax" type="number" min="0" step="500" placeholder="80000" value="${e.tax||''}">
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ─── CRUD ─── */
+function openAddModal() {
+  editId = null;
+  document.getElementById('modal-title').textContent = 'Add Employee';
+  document.getElementById('modal-body').innerHTML = formHTML();
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveEmployee()">
+      ${checkIcon()} Save Employee
+    </button>`;
+  openModal();
+}
+
+function editEmployee(id) {
+  const e = employees.find(x => x.id === id);
+  editId = id;
+  document.getElementById('modal-title').textContent = 'Edit Employee';
+  document.getElementById('modal-body').innerHTML = formHTML(e);
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveEmployee()">
+      ${checkIcon()} Save Changes
+    </button>`;
+  openModal();
+}
+
+function saveEmployee() {
+  const fname = document.getElementById('f-fname').value.trim();
+  const lname = document.getElementById('f-lname').value.trim();
+  const role  = document.getElementById('f-role').value.trim();
+  if (!fname || !lname || !role) {
+    showToast('Please fill in all required fields.', 'danger');
+    return;
+  }
+  const data = {
+    fname, lname, role,
+    dept:   document.getElementById('f-dept').value,
+    status: document.getElementById('f-status').value,
+    salary: parseFloat(document.getElementById('f-salary').value) || 0,
+    hra:    parseFloat(document.getElementById('f-hra').value)    || 0,
+    da:     parseFloat(document.getElementById('f-da').value)     || 0,
+    pf:     parseFloat(document.getElementById('f-pf').value)     || 0,
+    tax:    parseFloat(document.getElementById('f-tax').value)    || 0,
+  };
+  if (editId) {
+    const idx = employees.findIndex(e => e.id === editId);
+    employees[idx] = { ...employees[idx], ...data };
+    showToast('Employee updated successfully.', 'success');
+  } else {
+    employees.push({ id: genId(), ...data });
+    showToast('Employee added successfully.', 'success');
+  }
+  closeModal();
+  renderTable();
+}
+
+function deleteEmployee(id) {
+  const e = employees.find(x => x.id === id);
+  if (!confirm(`Delete ${e.fname} ${e.lname} (${e.id})?\nThis action cannot be undone.`)) return;
+  employees = employees.filter(x => x.id !== id);
+  showToast('Employee deleted.', 'danger');
+  renderTable();
+}
+
+function viewEmployee(id) {
+  const e  = employees.find(x => x.id === id);
+  const g  = gross(e), n = net(e);
+  const [bgC, fgC] = avatarColor(e.id);
+
+  document.getElementById('modal-title').textContent = 'Payroll Breakdown';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="emp-info-card">
+      <div class="avatar emp-info-avatar" style="background:${bgC};color:${fgC}">${initials(e)}</div>
+      <div>
+        <div class="emp-info-name">${e.fname} ${e.lname}</div>
+        <div class="emp-info-sub">${e.id} &nbsp;·&nbsp; ${e.dept} &nbsp;·&nbsp; ${e.role}</div>
+        <div style="margin-top:6px"><span class="badge badge-${e.status.toLowerCase()}">${e.status}</span></div>
+      </div>
+    </div>
+
+    <div class="payslip">
+      <div class="payslip-row">
+        <span class="label">Basic Salary</span>
+        <span class="value">${fmt(e.salary)}</span>
+      </div>
+      <div class="payslip-row">
+        <span class="label">HRA</span>
+        <span class="value">${fmt(e.hra)}</span>
+      </div>
+      <div class="payslip-row">
+        <span class="label">DA</span>
+        <span class="value">${fmt(e.da)}</span>
+      </div>
+      <div class="payslip-row gross">
+        <span class="label" style="font-weight:600">Gross Salary</span>
+        <span class="value">${fmt(g)}</span>
+      </div>
+      <div class="payslip-row deduction">
+        <span class="label">PF Deduction</span>
+        <span class="value">− ${fmt(e.pf)}</span>
+      </div>
+      <div class="payslip-row deduction">
+        <span class="label">Income Tax</span>
+        <span class="value">− ${fmt(e.tax)}</span>
+      </div>
+      <div class="payslip-row total">
+        <span>Net Take-Home / Year</span>
+        <span class="value">${fmt(n)}</span>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-top:10px;text-align:right">All figures in INR (₹) · Annual</p>
+  `;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn" onclick="closeModal()">Close</button>
+    <button class="btn btn-primary" onclick="closeModal(); setTimeout(()=>editEmployee('${e.id}'),50)">
+      ${editIcon()} Edit Employee
+    </button>`;
+  openModal();
+}
+
+/* ─── Toast ─── */
+function showToast(msg, type='success') {
+  const wrap = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<div class="toast-dot"></div>${msg}`;
+  wrap.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+/* ─── SVG Icons ─── */
+const eyeIcon   = () => `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const editIcon  = () => `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+const trashIcon = () => `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+const checkIcon = () => `<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>`;
+const usersIcon = () => `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
+const checkCircleIcon = () => `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+const rupeeIcon = () => `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><line x1="6" y1="4" x2="18" y2="4"/><line x1="6" y1="9" x2="18" y2="9"/><path d="M6 9l6 11"/><path d="M6 9h4a4 4 0 0 0 0-5H6"/></svg>`;
+
+/* ─── Init ─── */
+renderTable();
+</script>
+</body>
+</html>
