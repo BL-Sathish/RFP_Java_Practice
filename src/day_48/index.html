@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Payroll — Client Server App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0e14;
+      --surface: #13151e;
+      --card: #1a1d2a;
+      --border: #252837;
+      --accent: #7c6bff;
+      --accent2: #ff6b9d;
+      --accent3: #6bffc2;
+      --text: #e8eaf2;
+      --muted: #6b7280;
+      --danger: #ff4d6d;
+      --success: #22d3a5;
+      --mono: 'DM Mono', monospace;
+      --display: 'Syne', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--display);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* BACKGROUND GRID */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* HEADER */
+    header {
+      padding: 28px 0 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 800;
+      box-shadow: 0 0 24px rgba(124,107,255,0.4);
+    }
+    .logo-text h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    .logo-text p { font-size: 11px; color: var(--muted); font-family: var(--mono); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+    .arch-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--card); border: 1px solid var(--border);
+      padding: 8px 16px; border-radius: 50px;
+      font-family: var(--mono); font-size: 12px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+    /* ARCH DIAGRAM */
+    .arch-section {
+      margin: 32px 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .arch-section h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 3px; color: var(--muted); margin-bottom: 20px; font-family: var(--mono); }
+    .arch-diagram {
+      display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap;
+    }
+    .arch-node {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 140px;
+    }
+    .arch-node .node-icon { font-size: 28px; margin-bottom: 6px; }
+    .arch-node .node-label { font-size: 13px; font-weight: 700; }
+    .arch-node .node-sub { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+    .arch-arrow {
+      display: flex; flex-direction: column; align-items: center; padding: 0 8px;
+    }
+    .arch-arrow .methods { font-size: 9px; color: var(--accent); font-family: var(--mono); text-align: center; margin-bottom: 4px; }
+    .arch-arrow .line {
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      position: relative;
+    }
+    .arch-arrow .line::after {
+      content: '▶'; position: absolute; right: -6px; top: -6px;
+      color: var(--accent2); font-size: 10px;
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .stat-card:nth-child(1)::before { background: var(--accent); }
+    .stat-card:nth-child(2)::before { background: var(--accent2); }
+    .stat-card:nth-child(3)::before { background: var(--accent3); }
+    .stat-card:nth-child(4)::before { background: #fbbf24; }
+    .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); font-family: var(--mono); margin-bottom: 8px; }
+    .stat-value { font-size: 28px; font-weight: 800; }
+
+    /* API LOG */
+    .api-log {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      font-family: var(--mono); font-size: 11px; padding: 12px 16px;
+      max-height: 80px; overflow-y: auto; margin-bottom: 28px;
+    }
+    .log-line { display: flex; gap: 10px; align-items: center; padding: 2px 0; }
+    .log-method { font-weight: 600; min-width: 44px; }
+    .log-method.GET { color: var(--accent3); }
+    .log-method.POST { color: var(--accent); }
+    .log-method.DELETE { color: var(--danger); }
+    .log-url { color: var(--muted); }
+    .log-status { margin-left: auto; }
+    .log-status.ok { color: var(--success); }
+    .log-status.err { color: var(--danger); }
+
+    /* FORM */
+    .form-section {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 24px; margin-bottom: 28px;
+    }
+    .form-section h2 { font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .form-section h2 span { font-size: 11px; font-family: var(--mono); color: var(--accent); background: rgba(124,107,255,0.12); padding: 2px 8px; border-radius: 4px; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); font-family: var(--mono); }
+    .field input, .field select {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 10px 14px; border-radius: 8px;
+      font-family: var(--display); font-size: 14px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,107,255,0.15); }
+    .field select option { background: var(--surface); }
+    .btn-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+    .btn {
+      padding: 11px 24px; border-radius: 8px; font-family: var(--display); font-size: 14px; font-weight: 700;
+      border: none; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #9689ff; box-shadow: 0 0 20px rgba(124,107,255,0.5); transform: translateY(-1px); }
+    .btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* TABLE */
+    .table-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .table-header {
+      padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-header h2 { font-size: 16px; font-weight: 700; }
+    .search-box {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px;
+    }
+    .search-box input { background: none; border: none; color: var(--text); font-family: var(--display); font-size: 13px; outline: none; width: 180px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--surface); }
+    th {
+      padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--muted); font-family: var(--mono); font-weight: 500;
+    }
+    td { padding: 14px 16px; border-top: 1px solid var(--border); font-size: 14px; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .emp-name { font-weight: 700; }
+    .emp-role { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+    .dept-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 600;
+      background: rgba(124,107,255,0.12); color: var(--accent); border: 1px solid rgba(124,107,255,0.25);
+    }
+    .salary { font-family: var(--mono); color: var(--accent3); font-weight: 600; }
+    .status-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 11px;
+      background: rgba(34,211,165,0.1); color: var(--success); border: 1px solid rgba(34,211,165,0.2);
+    }
+    .btn-delete {
+      background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.2);
+      color: var(--danger); padding: 6px 14px; border-radius: 6px;
+      font-family: var(--display); font-size: 12px; font-weight: 700; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-delete:hover { background: rgba(255,77,109,0.25); transform: scale(1.02); }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); font-family: var(--mono); }
+    .empty-state .e-icon { font-size: 40px; margin-bottom: 12px; }
+
+    /* TOAST */
+    #toast {
+      position: fixed; bottom: 32px; right: 32px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 22px; font-size: 14px; font-weight: 600;
+      display: none; align-items: center; gap: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 100;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+    #toast.success { border-color: var(--success); }
+    #toast.error { border-color: var(--danger); }
+
+    /* LOADING */
+    .loading-row td { text-align: center; color: var(--muted); padding: 40px; font-family: var(--mono); }
+
+    footer { text-align: center; padding: 40px 0; color: var(--muted); font-family: var(--mono); font-size: 11px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">EP</div>
+        <div class="logo-text">
+          <h1>Employee Payroll</h1>
+          <p>Client Server Architecture</p>
+        </div>
+      </div>
+      <div class="arch-badge">
+        <span class="dot"></span>
+        JSON Server @ localhost:3000
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Architecture Diagram -->
+  <div class="arch-section">
+    <h2>System Architecture</h2>
+    <div class="arch-diagram">
+      <div class="arch-node">
+        <div class="node-icon">🖥️</div>
+        <div class="node-label">Client</div>
+        <div class="node-sub">Browser / HTML</div>
+      </div>
+      <div class="arch-arrow">
+        <div class="methods">GET POST DELETE</div>
+        <div class="line"></div>
+      </div>
+      <div class="arch-node" style="border-color: var(--accent);">
+        <div class="node-icon">⚡</div>
+        <div class="node-label">JSON Server</div>
+        <div class="node-sub">localhost:3000</div>
+      </div>
+      <div class="arch-arrow">
+        <div class="methods">JSON Response</div>
+        <div class="line"></div>
+      </div>
+      <div class="arch-node">
+        <div class="node-icon">🗄️</div>
+        <div class="node-label">Database</div>
+        <div class="node-sub">db.json</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">Total Employees</div>
+      <div class="stat-value" id="stat-total">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Payroll</div>
+      <div class="stat-value" id="stat-payroll">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Departments</div>
+      <div class="stat-value" id="stat-dept">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Salary</div>
+      <div class="stat-value" id="stat-avg">—</div>
+    </div>
+  </div>
+
+  <!-- API Activity Log -->
+  <div class="api-log" id="api-log">
+    <div class="log-line" style="color: var(--muted);">// API activity log — requests appear here</div>
+  </div>
+
+  <!-- Add Employee Form -->
+  <div class="form-section">
+    <h2>Add Employee <span>POST /employees</span></h2>
+    <div class="form-grid">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="f-name" placeholder="e.g. Anita Sharma"/>
+      </div>
+      <div class="field">
+        <label>Role / Designation</label>
+        <input type="text" id="f-role" placeholder="e.g. Backend Engineer"/>
+      </div>
+      <div class="field">
+        <label>Department</label>
+        <select id="f-dept">
+          <option value="">Select department</option>
+          <option>Engineering</option>
+          <option>Product</option>
+          <option>Design</option>
+          <option>Analytics</option>
+          <option>Human Resources</option>
+          <option>Finance</option>
+          <option>Marketing</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Annual Salary (₹)</label>
+        <input type="number" id="f-salary" placeholder="e.g. 85000"/>
+      </div>
+      <div class="field">
+        <label>Joining Date</label>
+        <input type="date" id="f-date"/>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="addEmployee()">＋ Add Employee</button>
+      <button class="btn btn-secondary" onclick="fetchEmployees()">⟳ Refresh (GET)</button>
+    </div>
+  </div>
+
+  <!-- Employee Table -->
+  <div class="table-section">
+    <div class="table-header">
+      <h2>Employee Directory</h2>
+      <div class="search-box">
+        🔍 <input type="text" id="search" placeholder="Search employees..." oninput="filterTable()"/>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Employee</th>
+          <th>Department</th>
+          <th>Salary</th>
+          <th>Joining Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="emp-tbody">
+        <tr class="loading-row"><td colspan="7">Loading employees from server...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer><div class="container">Client Server Architecture • JSON Server • GET • POST • DELETE</div></footer>
+
+<div id="toast"></div>
+
+<script>
+  const BASE_URL = 'http://localhost:3000/employees';
+  let allEmployees = [];
+
+  // ─── API LOG ─────────────────────────────────────────────────────────────────
+  function logAPI(method, url, status) {
+    const log = document.getElementById('api-log');
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    const ok = status >= 200 && status < 300;
+    line.innerHTML = `
+      <span class="log-method ${method}">${method}</span>
+      <span class="log-url">${url}</span>
+      <span class="log-status ${ok?'ok':'err'}">${status} ${ok?'OK':'ERR'}</span>
+    `;
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  // ─── TOAST ───────────────────────────────────────────────────────────────────
+  function showToast(msg, type='success') {
+    const t = document.getElementById('toast');
+    t.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+    t.className = type;
+    t.style.display = 'flex';
+    setTimeout(() => { t.style.display = 'none'; }, 3000);
+  }
+
+  // ─── STATS ───────────────────────────────────────────────────────────────────
+  function updateStats(emps) {
+    document.getElementById('stat-total').textContent = emps.length;
+    const total = emps.reduce((s, e) => s + (e.salary||0), 0);
+    document.getElementById('stat-payroll').textContent = '₹' + (total/1000).toFixed(0) + 'K';
+    const depts = new Set(emps.map(e => e.department)).size;
+    document.getElementById('stat-dept').textContent = depts;
+    const avg = emps.length ? Math.round(total / emps.length) : 0;
+    document.getElementById('stat-avg').textContent = '₹' + (avg/1000).toFixed(0) + 'K';
+  }
+
+  // ─── RENDER TABLE ────────────────────────────────────────────────────────────
+  function renderTable(emps) {
+    const tbody = document.getElementById('emp-tbody');
+    if (!emps.length) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="e-icon">📭</div>No employees found</div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = emps.map(e => `
+      <tr>
+        <td style="font-family:var(--mono);color:var(--muted);font-size:12px">#${e.id}</td>
+        <td>
+          <div class="emp-name">${e.name}</div>
+          <div class="emp-role">${e.role}</div>
+        </td>
+        <td><span class="dept-badge">${e.department || '—'}</span></td>
+        <td class="salary">₹${(e.salary||0).toLocaleString()}</td>
+        <td style="font-family:var(--mono);font-size:12px;color:var(--muted)">${e.joiningDate || '—'}</td>
+        <td><span class="status-badge">${e.status || 'Active'}</span></td>
+        <td><button class="btn-delete" onclick="deleteEmployee(${e.id})">DELETE</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function filterTable() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const filtered = allEmployees.filter(e =>
+      e.name.toLowerCase().includes(q) ||
+      (e.department||'').toLowerCase().includes(q) ||
+      (e.role||'').toLowerCase().includes(q)
+    );
+    renderTable(filtered);
+  }
+
+  // ─── GET: FETCH EMPLOYEES ────────────────────────────────────────────────────
+  async function fetchEmployees() {
+    try {
+      const res = await fetch(BASE_URL);
+      logAPI('GET', BASE_URL, res.status);
+      if (!res.ok) throw new Error('Server error');
+      allEmployees = await res.json();
+      renderTable(allEmployees);
+      updateStats(allEmployees);
+    } catch (err) {
+      logAPI('GET', BASE_URL, 500);
+      document.getElementById('emp-tbody').innerHTML = `
+        <tr class="loading-row"><td colspan="7">
+          ⚠️ Cannot connect to JSON Server. Run: <code>npx json-server --watch server/db.json --port 3000</code>
+        </td></tr>`;
+      showToast('Cannot reach server. Is JSON Server running?', 'error');
+    }
+  }
+
+  // ─── POST: ADD EMPLOYEE ──────────────────────────────────────────────────────
+  async function addEmployee() {
+    const name = document.getElementById('f-name').value.trim();
+    const role = document.getElementById('f-role').value.trim();
+    const department = document.getElementById('f-dept').value;
+    const salary = parseInt(document.getElementById('f-salary').value);
+    const joiningDate = document.getElementById('f-date').value;
+
+    if (!name || !role || !department || !salary) {
+      showToast('Please fill all required fields', 'error'); return;
+    }
+
+    const payload = { name, role, department, salary, joiningDate, status: 'Active' };
+
+    try {
+      const res = await fetch(BASE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      logAPI('POST', BASE_URL, res.status);
+      if (!res.ok) throw new Error();
+      showToast(`${name} added successfully!`);
+      // Clear form
+      ['f-name','f-role','f-salary','f-date'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f-dept').value = '';
+      fetchEmployees();
+    } catch {
+      logAPI('POST', BASE_URL, 500);
+      showToast('Failed to add employee', 'error');
+    }
+  }
+
+  // ─── DELETE: REMOVE EMPLOYEE ─────────────────────────────────────────────────
+  async function deleteEmployee(id) {
+    if (!confirm(`Delete employee #${id}?`)) return;
+    const url = `${BASE_URL}/${id}`;
+    try {
+      const res = await fetch(url, { method: 'DELETE' });
+      logAPI('DELETE', url, res.status);
+      if (!res.ok) throw new Error();
+      showToast(`Employee #${id} deleted`);
+      fetchEmployees();
+    } catch {
+      logAPI('DELETE', url, 500);
+      showToast('Failed to delete employee', 'error');
+    }
+  }
+
+  // Init
+  fetchEmployees();
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Payroll Service — API Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0e14; --surface: #13151e; --card: #1a1d2a; --border: #252837;
+      --accent: #7c6bff; --accent2: #ff6b9d; --accent3: #6bffc2;
+      --text: #e8eaf2; --muted: #6b7280; --danger: #ff4d6d; --success: #22d3a5;
+      --mono: 'DM Mono', monospace; --display: 'Syne', sans-serif;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--display); min-height: 100vh; padding: 32px; }
+    h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+    .sub { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 32px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+    .card h2 { font-size: 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .method-tag { padding: 2px 10px; border-radius: 4px; font-family: var(--mono); font-size: 11px; font-weight: 700; }
+    .GET  { background: rgba(107,255,194,0.15); color: var(--accent3); }
+    .POST { background: rgba(124,107,255,0.15); color: var(--accent); }
+    .DEL  { background: rgba(255,77,109,0.15); color: var(--danger); }
+    .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--display); font-weight: 700; font-size: 13px; transition: all 0.2s; }
+    .btn-get  { background: rgba(107,255,194,0.2); color: var(--accent3); border: 1px solid rgba(107,255,194,0.3); }
+    .btn-post { background: rgba(124,107,255,0.2); color: var(--accent); border: 1px solid rgba(124,107,255,0.3); }
+    .btn-del  { background: rgba(255,77,109,0.2); color: var(--danger); border: 1px solid rgba(255,77,109,0.3); }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.2); }
+    input, select {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 9px 14px; border-radius: 8px; font-family: var(--display); font-size: 13px;
+      width: 100%; margin-bottom: 10px; outline: none;
+    }
+    input:focus { border-color: var(--accent); }
+    .response {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px; font-family: var(--mono); font-size: 12px;
+      white-space: pre-wrap; max-height: 200px; overflow-y: auto; margin-top: 14px;
+      color: var(--accent3); min-height: 50px;
+    }
+    .label { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+  </style>
+</head>
+<body>
+<h1>Employee Payroll — Service Demo</h1>
+<p class="sub">// Demonstrating JSON Server API calls: GET · POST · DELETE</p>
+
+<div class="grid">
+
+  <!-- GET ALL -->
+  <div class="card">
+    <h2><span class="method-tag GET">GET</span> Fetch All Employees</h2>
+    <p class="label">Endpoint</p>
+    <input value="http://localhost:3000/employees" readonly/>
+    <button class="btn btn-get" onclick="getAll()">Send GET Request</button>
+    <div class="response" id="r-getall">// Response will appear here</div>
+  </div>
+
+  <!-- GET BY ID -->
+  <div class="card">
+    <h2><span class="method-tag GET">GET</span> Fetch Employee by ID</h2>
+    <p class="label">Employee ID</p>
+    <input type="number" id="get-id" placeholder="Enter employee ID (e.g. 1)" min="1"/>
+    <button class="btn btn-get" onclick="getById()">Send GET Request</button>
+    <div class="response" id="r-getid">// Response will appear here</div>
+  </div>
+
+  <!-- POST -->
+  <div class="card">
+    <h2><span class="method-tag POST">POST</span> Add New Employee</h2>
+    <p class="label">Name</p>
+    <input id="p-name" placeholder="Full name"/>
+    <p class="label">Role</p>
+    <input id="p-role" placeholder="Job role"/>
+    <p class="label">Salary</p>
+    <input type="number" id="p-salary" placeholder="Annual salary"/>
+    <button class="btn btn-post" onclick="postEmployee()">Send POST Request</button>
+    <div class="response" id="r-post">// Response will appear here</div>
+  </div>
+
+  <!-- DELETE -->
+  <div class="card">
+    <h2><span class="method-tag DEL">DELETE</span> Remove Employee</h2>
+    <p class="label">Employee ID to Delete</p>
+    <input type="number" id="del-id" placeholder="Enter employee ID"/>
+    <button class="btn btn-del" onclick="deleteEmp()">Send DELETE Request</button>
+    <div class="response" id="r-delete">// Response will appear here</div>
+  </div>
+
+</div>
+
+<script>
+  const BASE = 'http://localhost:3000/employees';
+
+  function display(id, data, isError) {
+    const el = document.getElementById(id);
+    el.textContent = JSON.stringify(data, null, 2);
+    el.style.color = isError ? 'var(--danger)' : 'var(--accent3)';
+  }
+
+  async function getAll() {
+    try {
+      const res = await fetch(BASE);
+      display('r-getall', await res.json());
+    } catch(e) { display('r-getall', { error: 'Server not running. Start JSON Server first.' }, true); }
+  }
+
+  async function getById() {
+    const id = document.getElementById('get-id').value;
+    if (!id) { display('r-getid', { error: 'Please enter an ID' }, true); return; }
+    try {
+      const res = await fetch(`${BASE}/${id}`);
+      display('r-getid', res.status === 404 ? { error: 'Employee not found' } : await res.json(), res.status === 404);
+    } catch(e) { display('r-getid', { error: 'Server not running.' }, true); }
+  }
+
+  async function postEmployee() {
+    const name = document.getElementById('p-name').value;
+    const role = document.getElementById('p-role').value;
+    const salary = parseInt(document.getElementById('p-salary').value);
+    if (!name || !role || !salary) { display('r-post', { error: 'Fill all fields' }, true); return; }
+    try {
+      const res = await fetch(BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, role, salary, status: 'Active' })
+      });
+      display('r-post', await res.json());
+    } catch(e) { display('r-post', { error: 'Server not running.' }, true); }
+  }
+
+  async function deleteEmp() {
+    const id = document.getElementById('del-id').value;
+    if (!id) { display('r-delete', { error: 'Please enter an ID' }, true); return; }
+    try {
+      const res = await fetch(`${BASE}/${id}`, { method: 'DELETE' });
+      display('r-delete', { message: res.ok ? `Employee ${id} deleted successfully` : 'Not found', status: res.status }, !res.ok);
+    } catch(e) { display('r-delete', { error: 'Server not running.' }, true); }
+  }
+</script>
+</body>
+</html>
