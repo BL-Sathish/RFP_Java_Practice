@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Details – Payroll System</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="emp-details.css"/>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">
+        <span class="logo-dot dot-red"></span>
+        <span class="logo-dot dot-amber"></span>
+        <span class="logo-dot dot-green"></span>
+      </div>
+      <div>
+        <div class="header-title">BridgeLabz</div>
+        <div class="header-sub">Employability Delivered</div>
+      </div>
+    </div>
+    <div class="header-tag">Employee Payroll System</div>
+    <nav class="header-nav">
+      <a href="index.html"        class="nav-link">Home</a>
+      <a href="add-employee.html" class="nav-link">Add Employee</a>
+      <a href="emp-details.html"  class="nav-link active">Employee Details</a>
+    </nav>
+  </header>
+
+  <main class="main-content">
+
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="section-header-left">
+        <h2 class="page-title">Employee Details</h2>
+        <p class="page-sub">Total Records: <strong id="empCount">0</strong></p>
+      </div>
+      <a href="add-employee.html" class="btn btn-add">+ Add Employee</a>
+    </div>
+
+    <!-- UC 5 – Department-wise tabular sections (innerHTML set from JS) -->
+    <div id="deptContainer"></div>
+
+  </main>
+
+  <!-- UC 5 – JSON data file loaded first -->
+  <script src="emp-data.js"></script>
+  <script src="emp-details.js"></script>
+</body>
+</html>

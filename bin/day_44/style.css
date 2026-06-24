@@ -1,0 +1,104 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f4f8;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.form-content {
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  width: 480px;
+}
+
+.form-head {
+  font-size: 20px;
+  font-weight: bold;
+  color: #1a3c5e;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #3b82f6;
+  padding-bottom: 8px;
+}
+
+.row-content {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+}
+
+/* error-output element */
+error-output {
+  display: block;
+  margin-left: 10px;
+  font-size: 12px;
+  font-style: italic;
+  color: red;
+  margin-top: 4px;
+  min-height: 16px;
+}
+
+/* salary output display */
+.salary-output {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #1a3c5e;
+  min-height: 18px;
+}
+
+.btn {
+  padding: 9px 24px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.btn:hover {
+  background: #1d4ed8;
+}
+
+.btn-reset {
+  background: #6b7280;
+}
+
+.btn-reset:hover {
+  background: #374151;
+}
+
+/* UC 3 – UI feedback for validation */
+.input-invalid {
+  border: 2px solid red;
+  background-color: #fff0f0;
+}
+
+.input-valid {
+  border: 2px solid green;
+  background-color: #f0fff4;
+}

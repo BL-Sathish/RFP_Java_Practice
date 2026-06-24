@@ -1,0 +1,179 @@
+/* ── UC 2: Employee Details Page ── */
+
+/* Section Header */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 28px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.section-header-left {}
+
+.page-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #1a3c5e;
+  margin-bottom: 4px;
+}
+
+.page-sub {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.btn-add {
+  background: #3b82f6;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-add:hover {
+  background: #1d4ed8;
+}
+
+/* Table */
+.table-wrap {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+
+.emp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.emp-table thead {
+  background: #1a3c5e;
+  color: #fff;
+}
+
+.emp-table thead th {
+  padding: 14px 18px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+}
+
+.emp-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.15s;
+}
+
+.emp-table tbody tr:hover {
+  background: #eff6ff;
+}
+
+.emp-table tbody td {
+  padding: 14px 18px;
+  color: #374151;
+  vertical-align: middle;
+}
+
+.emp-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Serial number cell */
+.emp-table td:first-child {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* Salary badge */
+.salary-badge {
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Dept badge */
+.dept-badge {
+  background: #f0fdf4;
+  color: #166534;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Action buttons */
+.action-btn {
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  margin-right: 6px;
+  transition: opacity 0.2s;
+}
+.action-btn:hover { opacity: 0.8; }
+.btn-edit   { background: #fef3c7; color: #92400e; }
+.btn-delete { background: #fee2e2; color: #991b1b; }
+
+/* Empty state */
+.empty-state {
+  display: none;
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+}
+.empty-state.show { display: block; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 15px; margin-bottom: 20px; }
+
+/* UC 3 – Tabular format refinements */
+.td-serial {
+  color: #9ca3af;
+  font-size: 13px;
+  width: 40px;
+  text-align: center;
+}
+
+.td-name {
+  font-weight: 600;
+  color: #1a3c5e;
+}
+
+.td-date {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.emp-table thead th:last-child,
+.emp-table tbody td:last-child {
+  text-align: center;
+}
+
+/* Table border lines for cleaner tabular look */
+.emp-table {
+  border: 1px solid #e5e7eb;
+}
+
+.emp-table thead th {
+  border-right: 1px solid rgba(255,255,255,0.15);
+}
+
+.emp-table tbody td {
+  border-right: 1px solid #f3f4f6;
+}
