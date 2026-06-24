@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Day 47 – Employee Payroll App</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --accent: #4f8ef7;
+      --accent2: #38d9a9;
+      --danger: #f76f6f;
+      --text: #e8eaf6;
+      --muted: #8892b0;
+      --border: #2e3350;
+      --font: 'Courier New', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 2px solid var(--accent);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    header .badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 9px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+    }
+    header h1 {
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 28px 20px;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--accent2);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 22px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .controls input[type="number"] {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      padding: 9px 14px;
+      border-radius: 6px;
+      width: 100px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .controls input[type="number"]:focus {
+      border-color: var(--accent);
+    }
+
+    button {
+      font-family: var(--font);
+      font-size: 13px;
+      padding: 9px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      letter-spacing: 0.5px;
+    }
+    button:active { transform: scale(0.97); }
+    button:hover { opacity: 0.85; }
+
+    .btn-primary   { background: var(--accent);  color: #fff; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-success   { background: var(--accent2); color: #0f1117; font-weight: bold; }
+    .btn-danger    { background: var(--danger);  color: #fff; }
+
+    /* ── Log / Output ── */
+    .log-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      min-height: 120px;
+      max-height: 260px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .log-box .log-entry { margin-bottom: 2px; }
+    .log-box .log-info  { color: var(--accent); }
+    .log-box .log-ok    { color: var(--accent2); }
+    .log-box .log-err   { color: var(--danger); }
+    .log-box .log-muted { color: var(--muted); font-size: 11px; }
+    .log-box .log-sep   { border-top: 1px solid var(--border); margin: 8px 0; }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead th {
+      background: var(--surface2);
+      color: var(--accent);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 11px 16px;
+      text-align: left;
+    }
+    tbody tr {
+      border-top: 1px solid var(--border);
+      transition: background .15s;
+    }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td {
+      padding: 11px 16px;
+      font-size: 13px;
+      color: var(--text);
+    }
+    tbody td.salary { color: var(--accent2); font-weight: bold; }
+    .empty-row td { color: var(--muted); text-align: center; padding: 28px; }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Concept tabs ── */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 6px 14px;
+      border-radius: 5px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="badge">DAY 47</span>
+  <h1>Employee Payroll App — Async · Ajax · Callback · Promise</h1>
+</header>
+
+<div class="container">
+
+  <!-- Concept selector -->
+  <div class="section-label">Concept</div>
+  <div class="tabs">
+    <div class="tab active" data-concept="all">All Concepts</div>
+    <div class="tab" data-concept="callback">Callback Style</div>
+    <div class="tab" data-concept="promise">Promise .then/.catch</div>
+    <div class="tab" data-concept="async">Async / Await</div>
+    <div class="tab" data-concept="parallel">Promise.all Parallel</div>
+  </div>
+
+  <!-- Controls -->
+  <div class="section-label">Controls</div>
+  <div class="controls">
+    <button class="btn-success" onclick="runConcept('fetchAll')">⬇ Fetch All Employees</button>
+    <button class="btn-primary" onclick="runConcept('fetchById')">🔍 Fetch by ID</button>
+    <input type="number" id="empId" value="1" min="1" max="5" placeholder="ID" />
+    <button class="btn-secondary" onclick="runConcept('parallel')">⚡ Parallel Fetch (Promise.all)</button>
+    <button class="btn-danger" onclick="clearLog()">✕ Clear Log</button>
+  </div>
+
+  <!-- Log -->
+  <div class="section-label">Console Output</div>
+  <div class="log-box" id="logBox">
+    <div class="log-entry log-muted">// Output appears here...</div>
+  </div>
+
+  <!-- Table -->
+  <div class="section-label">Employees Table</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Name</th><th>Department</th><th>Salary</th>
+        </tr>
+      </thead>
+      <tbody id="empTableBody">
+        <tr class="empty-row"><td colspan="4">No data loaded yet. Click "Fetch All Employees".</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  // ── Configuration ──────────────────────────────────────────────
+  const BASE_URL = "http://localhost:3000/employees";
+  let currentConcept = "all";
+
+  // ── Logging ────────────────────────────────────────────────────
+  const logBox = document.getElementById("logBox");
+
+  function log(msg, type = "info") {
+    const div = document.createElement("div");
+    div.className = `log-entry log-${type}`;
+    div.textContent = msg;
+    logBox.appendChild(div);
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function logSep() {
+    const div = document.createElement("div");
+    div.className = "log-sep";
+    logBox.appendChild(div);
+  }
+
+  function clearLog() {
+    logBox.innerHTML = '<div class="log-entry log-muted">// Cleared.</div>';
+  }
+
+  // ── Table Render ────────────────────────────────────────────────
+  function renderTable(employees) {
+    const tbody = document.getElementById("empTableBody");
+    if (!employees || employees.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No employees found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = employees.map(emp => `
+      <tr>
+        <td>${emp.id}</td>
+        <td>${emp.name}</td>
+        <td>${emp.department}</td>
+        <td class="salary">$${emp.salary.toLocaleString()}</td>
+      </tr>
+    `).join("");
+  }
+
+  // ── AJAX with Callback (simulated using fetch wrapped in function) ──
+  function ajaxGetCallback(url, callback) {
+    log(`[Callback] GET ${url}`, "muted");
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(data => callback(null, data))
+      .catch(err => callback(err, null));
+  }
+
+  // ── AJAX with Promise ──────────────────────────────────────────
+  function ajaxGetPromise(url) {
+    log(`[Promise] GET ${url}`, "muted");
+    return fetch(url).then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    });
+  }
+
+  // ── Run Concept ────────────────────────────────────────────────
+  function runConcept(action) {
+    logSep();
+    const empId = document.getElementById("empId").value || 1;
+
+    if (action === "fetchAll") {
+      if (currentConcept === "callback" || currentConcept === "all") {
+        // ── Callback style ──
+        log("▶ Fetch All — Callback Style", "info");
+        ajaxGetCallback(BASE_URL, (err, data) => {
+          if (err) { log("✖ Error: " + err.message, "err"); return; }
+          log(`✔ Got ${data.length} employees`, "ok");
+          data.forEach(e => log(`   ${e.id}. ${e.name} | ${e.department} | $${e.salary}`, "ok"));
+          renderTable(data);
+        });
+      }
+
+      if (currentConcept === "promise" || currentConcept === "all") {
+        // ── Promise .then/.catch ──
+        log("▶ Fetch All — Promise .then/.catch", "info");
+        ajaxGetPromise(BASE_URL)
+          .then(data => {
+            log(`✔ Promise resolved: ${data.length} employees`, "ok");
+            data.forEach(e => log(`   ${e.id}. ${e.name} | ${e.department} | $${e.salary}`, "ok"));
+            renderTable(data);
+          })
+          .catch(err => log("✖ Promise rejected: " + err.message, "err"));
+      }
+
+      if (currentConcept === "async" || currentConcept === "all") {
+        // ── Async / Await ──
+        log("▶ Fetch All — Async/Await", "info");
+        (async () => {
+          try {
+            const data = await ajaxGetPromise(BASE_URL);
+            log(`✔ Awaited: ${data.length} employees`, "ok");
+            data.forEach(e => log(`   ${e.id}. ${e.name} | ${e.department} | $${e.salary}`, "ok"));
+            renderTable(data);
+          } catch (err) {
+            log("✖ Await error: " + err.message, "err");
+          }
+        })();
+      }
+    }
+
+    if (action === "fetchById") {
+      const url = `${BASE_URL}/${empId}`;
+      log(`▶ Fetch Employee ID=${empId} — ${currentConcept === "callback" ? "Callback" : "Promise/Async"}`, "info");
+
+      if (currentConcept === "callback" || currentConcept === "all") {
+        ajaxGetCallback(url, (err, emp) => {
+          if (err) { log("✖ Error: " + err.message, "err"); return; }
+          log(`✔ Found: ${emp.name} | ${emp.department} | $${emp.salary}`, "ok");
+          renderTable([emp]);
+        });
+      } else {
+        (async () => {
+          try {
+            const emp = await ajaxGetPromise(url);
+            log(`✔ Found: ${emp.name} | ${emp.department} | $${emp.salary}`, "ok");
+            renderTable([emp]);
+          } catch (err) {
+            log("✖ Error: " + err.message, "err");
+          }
+        })();
+      }
+    }
+
+    if (action === "parallel") {
+      log("▶ Promise.all — Parallel fetch of 3 employees", "info");
+      const ids = [1, 2, 3];
+      Promise.all(ids.map(id => ajaxGetPromise(`${BASE_URL}/${id}`)))
+        .then(results => {
+          log(`✔ Promise.all resolved with ${results.length} results`, "ok");
+          results.forEach(e => log(`   ${e.name} | ${e.department} | $${e.salary}`, "ok"));
+          renderTable(results);
+        })
+        .catch(err => log("✖ Promise.all rejected: " + err.message, "err"));
+    }
+  }
+
+  // ── Tab switching ──────────────────────────────────────────────
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentConcept = tab.dataset.concept;
+      log(`// Switched to concept: ${currentConcept}`, "muted");
+    });
+  });
+</script>
+</body>
+</html>
